@@ -94,21 +94,46 @@ async function fetchLiveData(): Promise<object> {
 }
 
 // ── Code snippets ────────────────────────────────────────────────────────────
+const RPC_ENDPOINT = "https://rpc.mainnet.chain.robinhood.com";
+
 const SNIPPETS = {
-  fetch: `const res = await fetch("https://pingrbh.com/api");
-const data = await res.json();
-console.log(data.rpc.latencyMs, data.stats.txPerMin);`,
+  fetch: `// Ping the RPC — get block number + measure latency
+const t0 = performance.now();
+const res = await fetch("${RPC_ENDPOINT}", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    jsonrpc: "2.0", id: 1,
+    method: "eth_blockNumber", params: [],
+  }),
+});
+const latencyMs = Math.round(performance.now() - t0);
+const { result } = await res.json();
+const blockNumber = parseInt(result, 16);
+console.log({ latencyMs, blockNumber });`,
 
   viem: `import { createPublicClient, http } from "viem";
 
 const client = createPublicClient({
-  transport: http("https://rpc.mainnet.chain.robinhood.com"),
+  chain: { id: 4663, name: "Robinhood Chain",
+    nativeCurrency: { name: "ETH", symbol: "ETH", decimals: 18 },
+    rpcUrls: { default: { http: ["${RPC_ENDPOINT}"] } } },
+  transport: http("${RPC_ENDPOINT}"),
 });
 
-const block = await client.getBlockNumber();
-const gasPrice = await client.getGasPrice();`,
+const blockNumber = await client.getBlockNumber();
+const gasPrice = await client.getGasPrice();
+console.log({ blockNumber, gasPrice });`,
 
-  curl: `curl https://pingrbh.com/api`,
+  curl: `# Get current block number
+curl -s -X POST ${RPC_ENDPOINT} \\
+  -H "Content-Type: application/json" \\
+  -d '{"jsonrpc":"2.0","id":1,"method":"eth_blockNumber","params":[]}' | jq .
+
+# Get latest block with transactions
+curl -s -X POST ${RPC_ENDPOINT} \\
+  -H "Content-Type: application/json" \\
+  -d '{"jsonrpc":"2.0","id":1,"method":"eth_getBlockByNumber","params":["latest",false]}' | jq .`,
 };
 
 type Snippet = keyof typeof SNIPPETS;
@@ -191,7 +216,8 @@ export function ApiPage() {
           pingrbh API
         </h1>
         <p style={{ fontSize: 13, color: "var(--text-3)", lineHeight: 1.6 }}>
-          Use our live Robinhood Chain data in your own app. No API key. No rate limit. Just fetch.
+          The Robinhood Chain RPC is public — no API key, no rate limit. Call it directly from your app.
+          The live preview below shows the same data pingrbh uses, fetched fresh from the chain.
         </p>
       </div>
 
@@ -209,12 +235,12 @@ export function ApiPage() {
               ENDPOINT
             </span>
           </div>
-          <CopyButton text="https://pingrbh.com/api" label="Copy URL" />
+          <CopyButton text="https://rpc.mainnet.chain.robinhood.com" label="Copy URL" />
         </div>
         <div style={{ padding: "14px 20px" }}>
           <code style={{ fontFamily: "var(--mono)", fontSize: 13, color: "var(--text)" }}>
-            <span style={{ color: "var(--text-3)" }}>GET </span>
-            <span style={{ color: "var(--orange)" }}>https://pingrbh.com/api</span>
+            <span style={{ color: "var(--text-3)" }}>POST </span>
+            <span style={{ color: "var(--orange)" }}>https://rpc.mainnet.chain.robinhood.com</span>
           </code>
         </div>
       </div>
@@ -350,9 +376,9 @@ export function ApiPage() {
       {/* Note */}
       <div style={{ marginTop: 16, padding: "12px 16px", background: "var(--surface)", border: "1px solid var(--border)", borderRadius: "var(--r)", fontSize: 11, color: "var(--text-3)", lineHeight: 1.6 }}>
         <strong style={{ color: "var(--text-2)" }}>How it works — </strong>
-        All data is fetched live from the public Robinhood Chain RPC directly in your browser.
-        There is no server, no cache, and no intermediary. The latency reading reflects your network distance to the RPC.
-        CORS is open — call this from any frontend, no proxy needed.
+        The Robinhood Chain RPC at <code style={{ fontFamily: "var(--mono)", fontSize: 10 }}>rpc.mainnet.chain.robinhood.com</code> is public and open.
+        All data on this page is fetched directly from the chain — no server, no cache, no intermediary.
+        The latency reading reflects your network distance to the RPC node. CORS is open — call it from any frontend, no proxy needed.
       </div>
     </div>
   );
