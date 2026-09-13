@@ -1,0 +1,7 @@
+{
+  "rpc": { "latencyMs": 0, "blockNumber": 0, "level": "down", "endpoint": "https://rpc.mainnet.chain.robinhood.com" },
+  "chain": { "id": 4663, "name": "Robinhood Chain", "stack": "Arbitrum Orbit" },
+  "stats": { "txPerMin": 0, "activeWallets": 0, "contractDeploys": 0, "avgTxPerBlock": 0, "avgBlockTimeSec": 0.1, "baseFeeGwei": 0, "windowBlocks": 0 },
+  "timestamp": "pending",
+  "note": "Updated every 5 minutes via GitHub Actions. For real-time data call the RPC directly."
+}

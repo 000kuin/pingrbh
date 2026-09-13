@@ -95,42 +95,50 @@ async function fetchLiveData(): Promise<object> {
 
 // ── Code snippets ────────────────────────────────────────────────────────────
 const RPC_ENDPOINT = "https://rpc.mainnet.chain.robinhood.com";
+const DATA_URL     = "https://pingrbh.com/data.json";
 
 const SNIPPETS = {
-  fetch: `// Ping the RPC — get block number + measure latency
+  fetch: `// Snapshot (updated every 5 min) — instant, no computation needed
+const res  = await fetch("${DATA_URL}");
+const data = await res.json();
+console.log(data.rpc.latencyMs, data.stats.txPerMin);
+
+// Or call the RPC directly for real-time data
 const t0 = performance.now();
-const res = await fetch("${RPC_ENDPOINT}", {
+const rpc = await fetch("${RPC_ENDPOINT}", {
   method: "POST",
   headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({
-    jsonrpc: "2.0", id: 1,
-    method: "eth_blockNumber", params: [],
-  }),
+  body: JSON.stringify({ jsonrpc:"2.0", id:1, method:"eth_blockNumber", params:[] }),
 });
 const latencyMs = Math.round(performance.now() - t0);
-const { result } = await res.json();
-const blockNumber = parseInt(result, 16);
+const blockNumber = parseInt((await rpc.json()).result, 16);
 console.log({ latencyMs, blockNumber });`,
 
   viem: `import { createPublicClient, http } from "viem";
 
 const client = createPublicClient({
-  chain: { id: 4663, name: "Robinhood Chain",
+  chain: {
+    id: 4663,
+    name: "Robinhood Chain",
     nativeCurrency: { name: "ETH", symbol: "ETH", decimals: 18 },
-    rpcUrls: { default: { http: ["${RPC_ENDPOINT}"] } } },
+    rpcUrls: { default: { http: ["${RPC_ENDPOINT}"] } },
+  },
   transport: http("${RPC_ENDPOINT}"),
 });
 
 const blockNumber = await client.getBlockNumber();
-const gasPrice = await client.getGasPrice();
+const gasPrice    = await client.getGasPrice();
 console.log({ blockNumber, gasPrice });`,
 
-  curl: `# Get current block number
+  curl: `# Snapshot — updated every 5 min, returns JSON directly
+curl https://pingrbh.com/data.json
+
+# Real-time block number via RPC
 curl -s -X POST ${RPC_ENDPOINT} \\
   -H "Content-Type: application/json" \\
   -d '{"jsonrpc":"2.0","id":1,"method":"eth_blockNumber","params":[]}' | jq .
 
-# Get latest block with transactions
+# Latest block with transactions
 curl -s -X POST ${RPC_ENDPOINT} \\
   -H "Content-Type: application/json" \\
   -d '{"jsonrpc":"2.0","id":1,"method":"eth_getBlockByNumber","params":["latest",false]}' | jq .`,
@@ -221,7 +229,31 @@ export function ApiPage() {
         </p>
       </div>
 
-      {/* Endpoint */}
+      {/* Snapshot endpoint */}
+      <div style={{
+        background: "var(--surface)", border: "1px solid var(--border)",
+        borderRadius: "var(--r-lg)", overflow: "hidden", marginBottom: 8,
+      }}>
+        <div style={{
+          padding: "12px 20px", borderBottom: "1px solid var(--border)",
+          display: "flex", alignItems: "center", justifyContent: "space-between",
+        }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--text-3)" }}>
+              SNAPSHOT · updated every 5 min
+            </span>
+          </div>
+          <CopyButton text="https://pingrbh.com/data.json" label="Copy URL" />
+        </div>
+        <div style={{ padding: "14px 20px" }}>
+          <code style={{ fontFamily: "var(--mono)", fontSize: 13, color: "var(--text)" }}>
+            <span style={{ color: "var(--text-3)" }}>GET </span>
+            <span style={{ color: "var(--orange)" }}>https://pingrbh.com/data.json</span>
+          </code>
+        </div>
+      </div>
+
+      {/* RPC endpoint */}
       <div style={{
         background: "var(--surface)", border: "1px solid var(--border)",
         borderRadius: "var(--r-lg)", overflow: "hidden", marginBottom: 16,
@@ -232,7 +264,7 @@ export function ApiPage() {
         }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--text-3)" }}>
-              ENDPOINT
+              REAL-TIME RPC
             </span>
           </div>
           <CopyButton text="https://rpc.mainnet.chain.robinhood.com" label="Copy URL" />
