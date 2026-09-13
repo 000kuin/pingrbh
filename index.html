@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en" style="background:#05060e;color-scheme:dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="dark" />
+    <title>pingrbh — Live RPC Monitor for Robinhood Chain</title>
+    <meta name="description" content="Is Robinhood Chain up right now? Live RPC latency, block health, node uptime, and the one-word answer: FAST, SLOW, or DOWN." />
+    <meta property="og:title" content="pingrbh — Live RPC Monitor for Robinhood Chain" />
+    <meta property="og:description" content="Live latency, uptime, and block health for Robinhood Chain. Free forever." />
+    <meta property="og:url" content="https://pingrbh.com" />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="pingrbh — Live RPC Monitor for Robinhood Chain" />
+    <meta name="twitter:description" content="Is Robinhood Chain up? Live RPC latency, uptime, block health, and the $PING token. Free forever." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+    <style>html,body{background:#05060e!important;margin:0;padding:0}</style>
+    <script>
+      (function() {
+        var p = new URLSearchParams(window.location.search).get('p');
+        if (p) {
+          window.history.replaceState(null, null, p);
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

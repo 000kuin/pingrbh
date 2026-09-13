@@ -1,0 +1,224 @@
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  /* Cloudflare palette */
+  --bg:          #0D0D0D;
+  --bg-2:        #141414;
+  --bg-3:        #1C1C1C;
+  --surface:     #1A1A1A;
+  --surface-2:   #222222;
+  --border:      rgba(255,255,255,0.08);
+  --border-2:    rgba(255,255,255,0.12);
+  --border-3:    rgba(255,255,255,0.20);
+
+  /* Cloudflare orange */
+  --orange:        #F48120;
+  --orange-dim:    rgba(244,129,32,0.10);
+  --orange-border: rgba(244,129,32,0.25);
+  --orange-glow:   rgba(244,129,32,0.15);
+
+  /* Status */
+  --fast:         #22c55e;
+  --fast-dim:     rgba(34,197,94,0.10);
+  --fast-border:  rgba(34,197,94,0.25);
+
+  --normal:       #f59e0b;
+  --normal-dim:   rgba(245,158,11,0.10);
+  --normal-border:rgba(245,158,11,0.25);
+
+  --slow:         #ef4444;
+  --slow-dim:     rgba(239,68,68,0.10);
+  --slow-border:  rgba(239,68,68,0.25);
+
+  --down:         #ef4444;
+  --down-dim:     rgba(239,68,68,0.10);
+  --down-border:  rgba(239,68,68,0.25);
+
+  /* Text */
+  --text:    #FFFFFF;
+  --text-2:  #A1A1AA;
+  --text-3:  #52525B;
+  --text-4:  #3F3F46;
+
+  /* Typography — Space Mono for numbers (more industrial than JetBrains) */
+  --mono:  'Space Mono', 'JetBrains Mono', 'Fira Mono', monospace;
+  --sans:  'Inter', system-ui, sans-serif;
+
+  /* Shape — sharper corners, more industrial */
+  --r:    4px;
+  --r-sm: 2px;
+  --r-lg: 6px;
+  --r-xl: 8px;
+
+  /* Layout */
+  --sidebar-w: 200px;
+  --nav-h:     52px;
+}
+
+html, body, #root {
+  width: 100%; min-height: 100vh;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+body { overflow-x: hidden; }
+a    { color: inherit; text-decoration: none; }
+button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+input  { font-family: inherit; }
+::selection { background: rgba(244,129,32,0.25); }
+::-webkit-scrollbar { width: 3px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border-2); border-radius: 99px; }
+
+@keyframes pulse-ring {
+  0%   { transform: scale(1);   opacity: 0.7; }
+  100% { transform: scale(2.6); opacity: 0; }
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.3; }
+}
+
+@keyframes fade-up {
+  from { transform: translateY(10px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+@keyframes slot-up {
+  from { transform: translateY(0); }
+  to   { transform: translateY(-100%); }
+}
+@keyframes slot-down {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+
+@keyframes scan-line {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+/* ── Layout ── */
+.app-body {
+  display: grid;
+  grid-template-columns: var(--sidebar-w) 1fr;
+  min-height: calc(100vh - var(--nav-h) - 2px - 200px);
+}
+
+.app-sidebar {
+  border-right: 1px solid var(--border);
+  padding: 24px 0;
+  background: var(--bg-2);
+  position: sticky;
+  top: calc(var(--nav-h) + 2px);
+  height: calc(100vh - var(--nav-h) - 2px);
+  overflow-y: auto;
+}
+
+/* ── Mobile bottom-nav layout ── */
+@media (max-width: 768px) {
+  :root {
+    --sidebar-w: 100%;
+    --nav-h: 48px;
+  }
+
+  /* Stack hero vertically */
+  .hero-metrics {
+    grid-template-columns: 1fr !important;
+    gap: 24px !important;
+  }
+  .hero-divider { display: none !important; }
+
+  /* Stack body: sidebar becomes bottom tab bar */
+  .app-body {
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr auto;
+    min-height: unset;
+  }
+
+  .app-sidebar {
+    /* Become a horizontal bottom bar */
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    top: unset;
+    height: auto;
+    width: 100%;
+    border-right: none;
+    border-top: 1px solid var(--border);
+    padding: 0;
+    display: flex;
+    flex-direction: row;
+    overflow-x: auto;
+    overflow-y: hidden;
+    z-index: 100;
+    /* Hide the chain footer inside sidebar on mobile */
+  }
+
+  .app-sidebar > div:last-child { display: none; } /* chain footer */
+  .app-sidebar > div:first-child { display: none; } /* "Modules" label */
+
+  /* Tab buttons go horizontal in the bar */
+  .app-sidebar > div:nth-child(2) {
+    display: flex;
+    flex-direction: row;
+    gap: 0;
+    padding: 0;
+    width: 100%;
+  }
+  .app-sidebar > div:nth-child(2) button {
+    flex-direction: column;
+    gap: 2px;
+    padding: 8px 10px;
+    border-left: none !important;
+    border-top: 2px solid transparent;
+    border-radius: 0 !important;
+    min-width: 60px;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+  }
+  .app-sidebar > div:nth-child(2) button[style*="border-left: 2px solid var(--orange)"] {
+    border-top: 2px solid var(--orange) !important;
+    border-left: 2px solid transparent !important;
+  }
+  .app-sidebar > div:nth-child(2) button span:last-child {
+    display: none; /* hide sub-label on mobile */
+  }
+
+  /* Main content gets bottom padding so it doesn't hide behind the tab bar */
+  .app-body > main {
+    padding-bottom: 80px !important;
+    order: -1; /* content above the tab bar in DOM flow */
+  }
+
+  /* Nav bar smaller on mobile */
+  nav {
+    padding: 0 16px !important;
+  }
+
+  /* Hero padding */
+  .hero-section {
+    padding: 16px 16px 20px !important;
+  }
+
+  /* Grids that break on small screens */
+  [style*="grid-template-columns: repeat(4, 1fr)"] {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+  [style*="grid-template-columns: repeat(3, 1fr)"] {
+    grid-template-columns: 1fr 1fr !important;
+  }
+  [style*="grid-template-columns: 1fr 1fr"] {
+    grid-template-columns: 1fr !important;
+  }
+  [style*="grid-template-columns: 1fr 280px"],
+  [style*="grid-template-columns: 1fr 320px"],
+  [style*="grid-template-columns: 1fr 340px"] {
+    grid-template-columns: 1fr !important;
+  }
+}
