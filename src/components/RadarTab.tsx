@@ -1,7 +1,10 @@
-import React from "react";
+import React, { useRef, useEffect, useState } from "react";
 import { AreaChart, Area, XAxis, YAxis, ResponsiveContainer, Tooltip, BarChart, Bar } from "recharts";
 import type { TrafficPoint, ChainStats } from "../hooks/useChain.ts";
 import type { BlockFull } from "../lib/chain.ts";
+
+// How many data points to show on the stable chart
+const CHART_WINDOW = 120;
 
 interface Props {
   traffic: TrafficPoint[];
@@ -11,8 +14,34 @@ interface Props {
 }
 
 export function RadarTab({ traffic, stats, blocks, isMobile }: Props) {
-  // x-axis: show block number — more meaningful than timestamps on a 100ms chain
   const fmtBlock = (n: number) => `#${n.toLocaleString()}`;
+
+  // Stable accumulated chart buffer — only appends new blocks, never replaces
+  // This prevents the chart from completely redrawing every 4s poll
+  const seenBlocks   = useRef(new Set<number>());
+  const chartBuffer  = useRef<TrafficPoint[]>([]);
+  const [stableTraffic, setStableTraffic] = useState<TrafficPoint[]>([]);
+
+  useEffect(() => {
+    let changed = false;
+    for (const pt of traffic) {
+      if (!seenBlocks.current.has(pt.blockNumber)) {
+        seenBlocks.current.add(pt.blockNumber);
+        chartBuffer.current.push(pt);
+        changed = true;
+      }
+    }
+    if (!changed) return;
+
+    // Sort oldest→newest, cap at CHART_WINDOW
+    chartBuffer.current.sort((a, b) => a.blockNumber - b.blockNumber);
+    if (chartBuffer.current.length > CHART_WINDOW) {
+      const removed = chartBuffer.current.splice(0, chartBuffer.current.length - CHART_WINDOW);
+      for (const pt of removed) seenBlocks.current.delete(pt.blockNumber);
+    }
+
+    setStableTraffic([...chartBuffer.current]);
+  }, [traffic]);
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
@@ -47,10 +76,10 @@ export function RadarTab({ traffic, stats, blocks, isMobile }: Props) {
 
       {/* Charts */}
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 16 }}>
-        <Card title="Transactions per block" sub={`Last ${traffic.length} blocks · live`}>
-          {traffic.length > 1 ? (
+        <Card title="Transactions per block" sub={`Last ${stableTraffic.length} blocks · live`}>
+          {stableTraffic.length > 1 ? (
             <ResponsiveContainer width="100%" height={160}>
-              <AreaChart data={traffic} margin={{ top: 4, right: 0, bottom: 0, left: -20 }}>
+              <AreaChart data={stableTraffic} margin={{ top: 4, right: 0, bottom: 0, left: -20 }}>
                 <defs>
                   <linearGradient id="txGrad" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="5%"  stopColor="var(--orange)" stopOpacity={0.15} />
@@ -79,9 +108,9 @@ export function RadarTab({ traffic, stats, blocks, isMobile }: Props) {
         </Card>
 
         <Card title="Unique wallets per block" sub="Distinct from addresses">
-          {traffic.length > 1 ? (
+          {stableTraffic.length > 1 ? (
             <ResponsiveContainer width="100%" height={160}>
-              <BarChart data={traffic} margin={{ top: 4, right: 0, bottom: 0, left: -20 }}>
+              <BarChart data={stableTraffic} margin={{ top: 4, right: 0, bottom: 0, left: -20 }}>
                 <XAxis
                   dataKey="blockNumber"
                   tickFormatter={fmtBlock}
@@ -104,21 +133,21 @@ export function RadarTab({ traffic, stats, blocks, isMobile }: Props) {
         </Card>
       </div>
 
-      {/* Block tx heatmap — gas fill is meaningless on Arb Orbit (gasLimit = 2^50) */}
-      <Card title="Transactions per block (heatmap)" sub={`${blocks.length} blocks · bar height = tx count`}>
-        {blocks.length > 0 ? (
+      {/* Block tx heatmap — stable buffer, only appends new blocks */}
+      <Card title="Transactions per block (heatmap)" sub={`${stableTraffic.length} blocks · bar height = tx count`}>
+        {stableTraffic.length > 0 ? (
           <>
             {(() => {
-              const maxTx = Math.max(...blocks.map(b => b.txCount), 1);
+              const maxTx = Math.max(...stableTraffic.map(b => b.txCount), 1);
               return (
                 <div style={{ display: "flex", gap: 2, alignItems: "flex-end", height: 52, flexWrap: "wrap" }}>
-                  {blocks.slice().reverse().map((b) => {
+                  {stableTraffic.map((b) => {
                     const pct = b.txCount / maxTx;
                     const barColor = pct > 0.66 ? "var(--slow)" : pct > 0.33 ? "var(--normal)" : "var(--fast)";
                     return (
                       <div
-                        key={b.number}
-                        title={`Block #${b.number.toLocaleString()} · ${b.txCount} tx`}
+                        key={b.blockNumber}
+                        title={`Block #${b.blockNumber.toLocaleString()} · ${b.txCount} tx`}
                         style={{
                           width: 12,
                           height: Math.max(3, Math.round(pct * 52)),
