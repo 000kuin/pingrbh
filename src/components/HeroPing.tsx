@@ -190,14 +190,14 @@ export function HeroPing({
         <div style={{ width: 1, height: 80, background: "var(--border)", margin: "0 32px" }} />
 
         {/* Center: chain activity */}
-        <div style={{ padding: "0 32px" }}>
+        <div style={{ padding: "0 32px", overflow: "visible" }}>
           <div style={{ fontSize: 9, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--text-3)", marginBottom: 8 }}>
             Chain Activity
           </div>
-          <div style={{ display: "flex", alignItems: "flex-end", gap: 8, marginBottom: 16 }}>
+          <div style={{ display: "flex", alignItems: "flex-end", gap: 8, marginBottom: 16, paddingLeft: 2 }}>
             <span style={{
               fontFamily: "var(--mono)", fontSize: "clamp(56px, 7vw, 88px)",
-              fontWeight: 700, letterSpacing: "-0.05em", lineHeight: 0.9,
+              fontWeight: 700, letterSpacing: "-0.02em", lineHeight: 0.9,
               color: chainLoading ? "var(--text-3)" : "var(--orange)",
             }}>
               {chainLoading ? "—" : stats.txPerMin.toLocaleString()}
