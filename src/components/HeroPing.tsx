@@ -187,8 +187,6 @@ export function HeroPing({
           </div>
         </div>
 
-        <div style={{ width: 1, height: 80, background: "var(--border)", margin: "0 32px" }} />
-
         {/* Center: chain activity */}
         <div style={{ padding: "0 32px", overflow: "visible" }}>
           <div style={{ fontSize: 9, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--text-3)", marginBottom: 8 }}>
@@ -219,8 +217,6 @@ export function HeroPing({
             ))}
           </div>
         </div>
-
-        <div style={{ width: 1, height: 80, background: "var(--border)", margin: "0 32px" }} />
 
         {/* Right: infrastructure */}
         <div style={{ paddingLeft: 32 }}>
