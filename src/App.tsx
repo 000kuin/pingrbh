@@ -68,7 +68,8 @@ export function App() {
       deploys:   chain.deploys.length,
       maxThreat,
     });
-  }, [chain.stats.txPerMin, ping.latencyMs, chain.deploys.length]);
+  // include notifications.feed so settings changes are picked up immediately
+  }, [chain.stats.txPerMin, ping.latencyMs, chain.deploys.length, notifications.feed]);
   const color    = LEVEL_COLOR[ping.level] ?? "var(--fast)";
   const [tab, setTab] = useState<Tab>("radar");
 

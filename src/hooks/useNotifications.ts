@@ -91,7 +91,8 @@ export function useNotifications() {
 
   // Track state for edge-triggered alerts (only fire on transition, not every poll)
   const wasRpcDegraded  = useRef(false);
-  const lastDeployCount = useRef(0);
+  const hasFiredSurge   = useRef(false); // prevents re-firing while still in surge
+  const lastDeployCount = useRef(-1);    // -1 = not yet seeded (avoids false alert on first feed)
   const lastThreat      = useRef(0);
 
   const updateSettings = useCallback((patch: Partial<NotificationSettings>) => {
@@ -142,8 +143,12 @@ export function useNotifications() {
     // ── Chain surge ────────────────────────────────────────────────────────
     if (settings.chainSurge) {
       const threshold = settings.chainSurgeThreshold;
-      // Fire when average crosses threshold going upward
-      if (txAvgNow >= threshold && txAvgPrev < threshold) {
+      if (txAvgNow < threshold) {
+        // Below threshold — re-arm so next crossing fires
+        hasFiredSurge.current = false;
+      } else if (txAvgNow >= threshold && !hasFiredSurge.current) {
+        // Above threshold and haven't fired yet for this surge
+        hasFiredSurge.current = true;
         notify(
           "📈 Chain surge detected",
           `Robinhood Chain averaging ${Math.round(txAvgNow).toLocaleString()} tx/min over the last 60s`
@@ -172,25 +177,33 @@ export function useNotifications() {
     }
 
     // ── New deploy ─────────────────────────────────────────────────────────
-    if (settings.newDeploy && input.deploys > lastDeployCount.current) {
+    if (lastDeployCount.current === -1) {
+      // First feed — seed the counter without alerting (avoids firing on page load)
+      lastDeployCount.current = input.deploys;
+    } else if (settings.newDeploy && input.deploys > lastDeployCount.current) {
       const newCount = input.deploys - lastDeployCount.current;
       notify(
         "🔨 New contract deployed",
         `${newCount} new contract${newCount > 1 ? "s" : ""} detected on Robinhood Chain`
       );
+      lastDeployCount.current = input.deploys;
+    } else {
+      lastDeployCount.current = input.deploys;
     }
-    lastDeployCount.current = input.deploys;
 
     // ── Threat detected ────────────────────────────────────────────────────
-    if (settings.threatDetected && input.maxThreat >= settings.threatScore) {
+    // Reset baseline when threat clears so next high-threat event always fires
+    if (input.maxThreat === 0) {
+      lastThreat.current = 0;
+    } else if (settings.threatDetected && input.maxThreat >= settings.threatScore) {
       if (input.maxThreat > lastThreat.current) {
         notify(
           "🚨 High-threat wallet detected",
           `Threat score ${input.maxThreat}/100 — possible bot, sniper, or MEV activity`
         );
+        lastThreat.current = input.maxThreat;
       }
     }
-    lastThreat.current = input.maxThreat;
   }, [settings, permission]);
 
   // Sync permission state if user changes it in browser settings
