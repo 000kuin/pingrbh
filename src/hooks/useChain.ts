@@ -44,9 +44,10 @@ export function useChain(): ChainState {
     stats: EMPTY_STATS, loading: true, error: null, lastBlock: 0,
   });
 
-  const blocksRef    = useRef<BlockFull[]>([]);
-  const lastBlockRef = useRef(0);
-  const seenHashes   = useRef(new Set<number>()); // track block numbers we have
+  const blocksRef      = useRef<BlockFull[]>([]);
+  const lastBlockRef   = useRef(0);
+  const seenHashes     = useRef(new Set<number>()); // track block numbers we have
+  const failCountRef   = useRef(0);                 // consecutive failure counter
 
   const processBlocks = useCallback((fresh: BlockFull[]) => {
     // Merge new blocks into rolling window, dedup by block number
@@ -88,6 +89,7 @@ export function useChain(): ChainState {
       const result = processBlocks(fresh);
       if (!result) return;
 
+      failCountRef.current = 0; // reset on success
       setState(prev => ({
         ...prev,
         ...result,
@@ -95,11 +97,15 @@ export function useChain(): ChainState {
         error: null,
       }));
     } catch (e) {
-      setState(prev => ({
-        ...prev,
-        loading: false,
-        error: e instanceof Error ? e.message : "Failed to fetch chain data",
-      }));
+      failCountRef.current++;
+      // Only surface the error after 3 consecutive failures (~12s) — ignore transient blips
+      if (failCountRef.current >= 3) {
+        setState(prev => ({
+          ...prev,
+          loading: false,
+          error: e instanceof Error ? e.message : "Failed to fetch chain data",
+        }));
+      }
     }
   }, [processBlocks]);
 
