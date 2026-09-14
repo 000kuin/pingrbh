@@ -187,8 +187,8 @@ export function HeroPing({
           </div>
         </div>
 
-        {/* Center: chain activity */}
-        <div style={{ padding: "0 32px", overflow: "visible" }}>
+        {/* Right: chain activity */}
+        <div style={{ overflow: "visible" }}>
           <div style={{ fontSize: 9, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--text-3)", marginBottom: 8 }}>
             Chain Activity
           </div>
@@ -218,8 +218,6 @@ export function HeroPing({
           </div>
         </div>
 
-        {/* Right: placeholder to maintain grid layout */}
-        <div />
       </div>
     </div>
   );
