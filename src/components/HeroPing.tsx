@@ -148,9 +148,9 @@ export function HeroPing({
       <div style={{
         padding: "28px 32px",
         display: "grid",
-        gridTemplateColumns: "1fr 1px 1fr 1px 1fr",
-        alignItems: "center",
-        gap: 0,
+        gridTemplateColumns: "1fr 1fr",
+        alignItems: "start",
+        gap: "0 48px",
       }}>
         {/* Left: latency */}
         <div style={{ paddingRight: 32 }}>
@@ -218,28 +218,8 @@ export function HeroPing({
           </div>
         </div>
 
-        {/* Right: infrastructure */}
-        <div style={{ paddingLeft: 32 }}>
-          <div style={{ fontSize: 9, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--text-3)", marginBottom: 12 }}>
-            Infrastructure
-          </div>
-          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-            {[
-              { name: "rpc.mainnet.chain.robinhood.com", status: level !== "down" ? "operational" : "down", latency: latencyMs },
-              { name: "Block production",                status: blocksOk ? "operational" : "unknown",     latency: null },
-              { name: "Chain ID 4663 · Arb Orbit",      status: "operational",                             latency: null },
-            ].map(({ name, status, latency }) => (
-              <div key={name} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
-                <span style={{ fontSize: 10, color: "var(--text-3)", fontFamily: "var(--mono)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", flex: 1 }}>
-                  {name}
-                </span>
-                <span style={{ fontSize: 10, fontWeight: 700, color: status === "operational" ? "var(--fast)" : status === "down" ? "var(--down)" : "var(--text-3)", flexShrink: 0 }}>
-                  {latency !== null ? `${latency}ms` : status}
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
+        {/* Right: placeholder to maintain grid layout */}
+        <div />
       </div>
     </div>
   );
