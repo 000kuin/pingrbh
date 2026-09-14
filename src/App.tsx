@@ -26,16 +26,16 @@ const LEVEL_COLOR: Record<string, string> = {
 
 type Tab = "radar" | "firewall" | "edge" | "dns" | "workers" | "network" | "analytics" | "logs" | "shield";
 
-const TABS: { id: Tab; label: string; sub: string }[] = [
-  { id: "radar",     label: "Radar",     sub: "Traffic"       },
-  { id: "firewall",  label: "Firewall",  sub: "Threats"       },
-  { id: "edge",      label: "Edge",      sub: "Deploys"       },
-  { id: "workers",   label: "Workers",   sub: "Calls"         },
-  { id: "analytics", label: "Analytics", sub: "Value"         },
-  { id: "logs",      label: "Logs",      sub: "Stream"        },
-  { id: "network",   label: "Network",   sub: "Map"           },
-  { id: "dns",       label: "DNS",       sub: "RPC"           },
-  { id: "shield",    label: "Shield",    sub: "Uptime"        },
+const TABS: { id: Tab; label: string; sub: string; short: string }[] = [
+  { id: "radar",     label: "Radar",     sub: "Traffic",  short: "Radar"    },
+  { id: "firewall",  label: "Firewall",  sub: "Threats",  short: "Firewall" },
+  { id: "edge",      label: "Edge",      sub: "Deploys",  short: "Edge"     },
+  { id: "workers",   label: "Workers",   sub: "Calls",    short: "Workers"  },
+  { id: "analytics", label: "Analytics", sub: "Value",    short: "Analytics"},
+  { id: "logs",      label: "Logs",      sub: "Stream",   short: "Logs"     },
+  { id: "network",   label: "Network",   sub: "Map",      short: "Network"  },
+  { id: "dns",       label: "DNS",       sub: "RPC",      short: "DNS"      },
+  { id: "shield",    label: "Shield",    sub: "Uptime",   short: "Shield"   },
 ];
 
 function TabFallback() {
@@ -91,7 +91,7 @@ export function App() {
             display: "grid",
             gridTemplateColumns: isMobile ? "1fr" : "var(--sidebar-w) 1fr",
             minHeight: isMobile ? "auto" : "calc(100vh - var(--nav-h) - 2px - 200px)",
-            paddingBottom: isMobile ? 64 : 0,
+            paddingBottom: isMobile ? 72 : 0,
           }}>
 
             {/* Sidebar — desktop sticky rail; mobile: hidden (tab bar below) */}
@@ -202,46 +202,51 @@ export function App() {
             </main>
           </div>
 
-          {/* Mobile bottom tab bar */}
+          {/* Mobile bottom tab bar — horizontally scrollable */}
           {isMobile && (
             <nav style={{
               position: "fixed",
               bottom: 0, left: 0, right: 0,
-              height: 56,
+              height: 52,
               background: "var(--bg-2)",
               borderTop: "1px solid var(--border)",
               display: "flex",
               zIndex: 200,
               overflowX: "auto",
+              overflowY: "hidden",
+              WebkitOverflowScrolling: "touch" as any,
+              scrollbarWidth: "none" as any,
             }}>
-              {TABS.map(({ id, label }) => {
+              {TABS.map(({ id, short }) => {
                 const active = tab === id;
                 return (
                   <button
                     key={id}
                     onClick={() => setTab(id)}
                     style={{
-                      flex: 1,
-                      minWidth: 52,
+                      flexShrink: 0,
+                      minWidth: 72,
+                      height: 52,
                       display: "flex",
-                      flexDirection: "column",
                       alignItems: "center",
                       justifyContent: "center",
-                      gap: 3,
                       background: "transparent",
                       border: "none",
                       borderTop: `2px solid ${active ? "var(--orange)" : "transparent"}`,
+                      borderBottom: "none",
                       color: active ? "var(--orange)" : "var(--text-3)",
-                      fontSize: 9,
+                      fontSize: 10,
                       fontWeight: active ? 700 : 400,
                       cursor: "pointer",
-                      padding: "0 4px",
-                      letterSpacing: "0.03em",
+                      padding: "0 12px",
+                      letterSpacing: "0.04em",
                       transition: "color 0.1s, border-color 0.1s",
                       textTransform: "uppercase",
+                      fontFamily: "var(--sans)",
+                      whiteSpace: "nowrap",
                     }}
                   >
-                    {label}
+                    {short}
                   </button>
                 );
               })}

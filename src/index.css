@@ -122,6 +122,12 @@ input  { font-family: inherit; }
 
 /* ── Mobile bottom-nav layout ── */
 @media (max-width: 768px) {
+  /* Hide block counter and explorer link in nav */
+  .nav-explorer { display: none !important; }
+
+  /* Hide scrollbar on mobile tab bar */
+  nav::-webkit-scrollbar { display: none; }
+
   :root {
     --sidebar-w: 100%;
     --nav-h: 48px;

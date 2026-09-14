@@ -32,30 +32,101 @@ export function HeroPing({
 }: Props) {
   const cfg = LEVEL[level];
 
+  // ── Mobile: compact single-column hero ────────────────────────────────────
+  if (isMobile) {
+    return (
+      <div style={{ borderBottom: "1px solid var(--border)", background: "var(--bg-2)" }}>
+        {/* Status banner */}
+        <div style={{
+          display: "flex", alignItems: "center", justifyContent: "space-between",
+          padding: "7px 16px",
+          background: cfg.bg,
+          borderBottom: `1px solid ${cfg.border}`,
+        }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <LiveDot color={cfg.color} size={5} />
+            <span style={{ fontSize: 10, fontWeight: 700, color: cfg.color, letterSpacing: "0.05em" }}>
+              {cfg.verdict}
+            </span>
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            {[
+              { name: "RPC",    ok: level !== "down" },
+              { name: "Blocks", ok: blocksOk && !chainError },
+            ].map(({ name, ok }) => (
+              <span key={name} style={{ fontSize: 9, color: ok ? cfg.color : "var(--down)", fontFamily: "var(--mono)", fontWeight: 600 }}>
+                {ok ? "●" : "○"} {name}
+              </span>
+            ))}
+          </div>
+        </div>
+
+        {/* Main metric row — latency big, key stats beside */}
+        <div style={{ padding: "16px 16px 12px", display: "flex", alignItems: "center", gap: 20 }}>
+          {/* Big latency */}
+          <div style={{ flexShrink: 0 }}>
+            <div style={{ fontSize: 8, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--text-3)", marginBottom: 4 }}>
+              RPC Latency
+            </div>
+            <div style={{ display: "flex", alignItems: "flex-end", gap: 5 }}>
+              <RollingNumber
+                value={latencyMs}
+                decimals={0}
+                color="var(--text)"
+                style={{
+                  fontSize: "clamp(44px, 13vw, 64px)",
+                  fontWeight: 700,
+                  letterSpacing: "-0.05em",
+                  lineHeight: 0.9,
+                  fontFamily: "var(--mono)",
+                }}
+              />
+              <span style={{ fontFamily: "var(--mono)", fontSize: 14, fontWeight: 400, color: "var(--text-3)", paddingBottom: 4 }}>ms</span>
+            </div>
+          </div>
+
+          {/* Vertical divider */}
+          <div style={{ width: 1, height: 52, background: "var(--border)", flexShrink: 0 }} />
+
+          {/* Key stats */}
+          <div style={{ flex: 1, display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px 12px" }}>
+            {[
+              { label: "Avg",      value: `${avg5m}ms` },
+              { label: "Uptime",   value: `${uptime}%` },
+              { label: "Tx/min",   value: chainLoading ? "—" : stats.txPerMin.toLocaleString() },
+              { label: "Wallets",  value: chainLoading ? "—" : stats.activeWallets.toLocaleString() },
+            ].map(({ label, value }) => (
+              <div key={label}>
+                <div style={{ fontSize: 8, fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--text-3)", marginBottom: 2 }}>{label}</div>
+                <div style={{ fontFamily: "var(--mono)", fontSize: 11, fontWeight: 700, color: "var(--text-2)" }}>{value}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ── Desktop: full three-column hero ───────────────────────────────────────
   return (
     <div style={{ borderBottom: "1px solid var(--border)", background: "var(--bg-2)" }}>
 
       {/* Status banner */}
       <div style={{
         display: "flex", alignItems: "center", justifyContent: "space-between",
-        padding: isMobile ? "8px 16px" : "8px 32px",
+        padding: "8px 32px",
         background: cfg.bg,
         borderBottom: `1px solid ${cfg.border}`,
-        flexWrap: "wrap", gap: 8,
       }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
           <LiveDot color={cfg.color} size={6} />
           <span style={{ fontSize: 11, fontWeight: 600, color: cfg.color, letterSpacing: "0.02em" }}>
             {cfg.verdict}
           </span>
-          {!isMobile && (
-            <>
-              <span style={{ fontSize: 11, color: cfg.color, opacity: 0.7 }}>—</span>
-              <span style={{ fontSize: 11, color: cfg.color, opacity: 0.7 }}>{cfg.label}</span>
-            </>
-          )}
+          <span style={{ fontSize: 11, color: cfg.color, opacity: 0.7 }}>—</span>
+          <span style={{ fontSize: 11, color: cfg.color, opacity: 0.7 }}>{cfg.label}</span>
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: isMobile ? 12 : 24 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 24 }}>
           {[
             { name: "RPC",    ok: level !== "down" },
             { name: "Blocks", ok: blocksOk && !chainError },
@@ -65,7 +136,7 @@ export function HeroPing({
               {ok ? "●" : "○"} {name}
             </span>
           ))}
-          {lastUpdated && !isMobile && (
+          {lastUpdated && (
             <span style={{ fontSize: 10, color: "var(--text-3)", fontFamily: "var(--mono)" }}>
               {lastUpdated.toLocaleTimeString()}
             </span>
@@ -73,17 +144,16 @@ export function HeroPing({
         </div>
       </div>
 
-      {/* Main metrics */}
+      {/* Main metrics — three columns */}
       <div style={{
-        padding: isMobile ? "20px 16px" : "28px 32px",
+        padding: "28px 32px",
         display: "grid",
-        gridTemplateColumns: isMobile ? "1fr 1fr" : "1fr 1px 1fr 1px 1fr",
-        alignItems: "start",
-        gap: isMobile ? "20px 16px" : 0,
+        gridTemplateColumns: "1fr 1px 1fr 1px 1fr",
+        alignItems: "center",
+        gap: 0,
       }}>
-
-        {/* Latency — always shown, full-width on mobile */}
-        <div style={{ paddingRight: isMobile ? 0 : 32, gridColumn: isMobile ? "1 / -1" : undefined }}>
+        {/* Left: latency */}
+        <div style={{ paddingRight: 32 }}>
           <div style={{ fontSize: 9, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--text-3)", marginBottom: 8 }}>
             RPC Response Time
           </div>
@@ -93,7 +163,7 @@ export function HeroPing({
               decimals={0}
               color="var(--text)"
               style={{
-                fontSize: isMobile ? "clamp(48px, 16vw, 72px)" : "clamp(56px, 7vw, 88px)",
+                fontSize: "clamp(56px, 7vw, 88px)",
                 fontWeight: 700,
                 letterSpacing: "-0.05em",
                 lineHeight: 0.9,
@@ -102,7 +172,7 @@ export function HeroPing({
             />
             <span style={{ fontFamily: "var(--mono)", fontSize: 18, fontWeight: 400, color: "var(--text-3)", paddingBottom: 6 }}>ms</span>
           </div>
-          <div style={{ display: "flex", gap: isMobile ? 16 : 20, flexWrap: "wrap" }}>
+          <div style={{ display: "flex", gap: 20, flexWrap: "wrap" }}>
             {[
               { label: "avg",      value: `${avg5m}ms` },
               { label: "uptime",   value: `${uptime}%` },
@@ -117,24 +187,22 @@ export function HeroPing({
           </div>
         </div>
 
-        {/* Divider — desktop only */}
-        {!isMobile && <div style={{ width: 1, height: 80, background: "var(--border)", margin: "0 32px" }} />}
+        <div style={{ width: 1, height: 80, background: "var(--border)", margin: "0 32px" }} />
 
-        {/* Chain Activity */}
-        <div style={{ padding: isMobile ? 0 : "0 32px" }}>
+        {/* Center: chain activity */}
+        <div style={{ padding: "0 32px" }}>
           <div style={{ fontSize: 9, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--text-3)", marginBottom: 8 }}>
             Chain Activity
           </div>
           <div style={{ display: "flex", alignItems: "flex-end", gap: 8, marginBottom: 16 }}>
             <span style={{
-              fontFamily: "var(--mono)",
-              fontSize: isMobile ? "clamp(36px, 10vw, 52px)" : "clamp(56px, 7vw, 88px)",
+              fontFamily: "var(--mono)", fontSize: "clamp(56px, 7vw, 88px)",
               fontWeight: 700, letterSpacing: "-0.05em", lineHeight: 0.9,
               color: chainLoading ? "var(--text-3)" : "var(--orange)",
             }}>
               {chainLoading ? "—" : stats.txPerMin.toLocaleString()}
             </span>
-            <span style={{ fontFamily: "var(--mono)", fontSize: 12, fontWeight: 400, color: "var(--text-3)", paddingBottom: 4, lineHeight: 1.3 }}>
+            <span style={{ fontFamily: "var(--mono)", fontSize: 14, fontWeight: 400, color: "var(--text-3)", paddingBottom: 6, lineHeight: 1.3 }}>
               tx<br/>/ min
             </span>
           </div>
@@ -152,54 +220,30 @@ export function HeroPing({
           </div>
         </div>
 
-        {/* Divider — desktop only */}
-        {!isMobile && <div style={{ width: 1, height: 80, background: "var(--border)", margin: "0 32px" }} />}
+        <div style={{ width: 1, height: 80, background: "var(--border)", margin: "0 32px" }} />
 
-        {/* Infrastructure — desktop only */}
-        {!isMobile && (
-          <div style={{ paddingLeft: 32 }}>
-            <div style={{ fontSize: 9, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--text-3)", marginBottom: 12 }}>
-              Infrastructure
-            </div>
-            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-              {[
-                { name: "rpc.mainnet.chain.robinhood.com", status: level !== "down" ? "operational" : "down", latency: latencyMs },
-                { name: "Block production",                status: blocksOk ? "operational" : "unknown",     latency: null },
-                { name: "Chain ID 4663 · Arb Orbit",      status: "operational",                             latency: null },
-              ].map(({ name, status, latency }) => (
-                <div key={name} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
-                  <span style={{ fontSize: 10, color: "var(--text-3)", fontFamily: "var(--mono)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", flex: 1 }}>
-                    {name}
-                  </span>
-                  <span style={{ fontSize: 10, fontWeight: 700, color: status === "operational" ? "var(--fast)" : status === "down" ? "var(--down)" : "var(--text-3)", flexShrink: 0 }}>
-                    {latency !== null ? `${latency}ms` : status}
-                  </span>
-                </div>
-              ))}
-            </div>
+        {/* Right: infrastructure */}
+        <div style={{ paddingLeft: 32 }}>
+          <div style={{ fontSize: 9, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--text-3)", marginBottom: 12 }}>
+            Infrastructure
           </div>
-        )}
-
-        {/* Mobile: block info column */}
-        {isMobile && (
-          <div>
-            <div style={{ fontSize: 9, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--text-3)", marginBottom: 8 }}>
-              Network
-            </div>
-            <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-              {[
-                { label: "Chain", value: "Robinhood" },
-                { label: "ID",    value: "4663" },
-                { label: "Stack", value: "Arb Orbit" },
-              ].map(({ label, value }) => (
-                <div key={label} style={{ display: "flex", justifyContent: "space-between", gap: 8 }}>
-                  <span style={{ fontSize: 9, color: "var(--text-3)", textTransform: "uppercase", letterSpacing: "0.07em" }}>{label}</span>
-                  <span style={{ fontFamily: "var(--mono)", fontSize: 11, fontWeight: 700, color: "var(--text-2)" }}>{value}</span>
-                </div>
-              ))}
-            </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            {[
+              { name: "rpc.mainnet.chain.robinhood.com", status: level !== "down" ? "operational" : "down", latency: latencyMs },
+              { name: "Block production",                status: blocksOk ? "operational" : "unknown",     latency: null },
+              { name: "Chain ID 4663 · Arb Orbit",      status: "operational",                             latency: null },
+            ].map(({ name, status, latency }) => (
+              <div key={name} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
+                <span style={{ fontSize: 10, color: "var(--text-3)", fontFamily: "var(--mono)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", flex: 1 }}>
+                  {name}
+                </span>
+                <span style={{ fontSize: 10, fontWeight: 700, color: status === "operational" ? "var(--fast)" : status === "down" ? "var(--down)" : "var(--text-3)", flexShrink: 0 }}>
+                  {latency !== null ? `${latency}ms` : status}
+                </span>
+              </div>
+            ))}
           </div>
-        )}
+        </div>
       </div>
     </div>
   );

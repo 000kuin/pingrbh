@@ -38,7 +38,7 @@ export function Root() {
 
       <nav style={{
         height: "var(--nav-h)",
-        padding: "0 32px",
+        padding: "0 16px",
         display: "flex", alignItems: "center", justifyContent: "space-between",
         borderBottom: "1px solid var(--border)",
         background: "var(--bg-2)",
@@ -99,15 +99,14 @@ export function Root() {
           })}
         </div>
 
-        {/* Right: live block counter + explorer link */}
+        {/* Right: live block counter + explorer (hidden on mobile) */}
         <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
           {blockNumber !== null && (
-            <div style={{
+            <div className="nav-explorer" style={{
               display: "flex", alignItems: "center", gap: 6,
               fontFamily: "var(--mono)", fontSize: 11, color: "var(--text-3)",
               letterSpacing: "0.01em",
             }}>
-              {/* LiveDot pattern: relative container so ring doesn't overflow */}
               <span style={{ position: "relative", display: "inline-flex", width: 6, height: 6, flexShrink: 0 }}>
                 <span style={{
                   position: "absolute", inset: 0, borderRadius: "50%",
@@ -125,6 +124,7 @@ export function Root() {
           <a
             href="https://robinhoodchain.blockscout.com"
             target="_blank" rel="noopener noreferrer"
+            className="nav-explorer"
             style={{
               display: "flex", alignItems: "center", gap: 5,
               fontSize: 11, color: "var(--text-3)",
