@@ -11,7 +11,7 @@ export function RollingNumber({ value, decimals = 0, style, color = "inherit" }:
   const formatted = value.toFixed(decimals);
 
   return (
-    <span style={{ display: "inline-flex", alignItems: "flex-end", ...style }}>
+    <span style={{ display: "inline-flex", alignItems: "flex-end", overflow: "visible", ...style }}>
       {formatted.split("").map((char, i) => (
         // Key from the RIGHT so length changes don't recycle wrong Digit instances
         <Digit key={formatted.length - 1 - i} char={char} color={color} />
