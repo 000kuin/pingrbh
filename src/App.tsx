@@ -1,8 +1,9 @@
-import React, { useState, lazy, Suspense } from "react";
+import React, { useState, lazy, Suspense, useEffect } from "react";
 import { usePing } from "./hooks/usePing.ts";
 import { useChain } from "./hooks/useChain.ts";
 import { useIsMobile } from "./hooks/useIsMobile.ts";
 import { useFailover } from "./hooks/useFailover.ts";
+import { useNotifications } from "./hooks/useNotifications.ts";
 import { HeroPing } from "./components/HeroPing.tsx";
 import { LiveDot } from "./components/Icons.tsx";
 
@@ -15,7 +16,8 @@ const DnsTab       = lazy(() => import("./components/DnsTab.tsx").then(m => ({ d
 const WorkersTab   = lazy(() => import("./components/WorkersTab.tsx").then(m => ({ default: m.WorkersTab })));
 const NetworkTab   = lazy(() => import("./components/NetworkTab.tsx").then(m => ({ default: m.NetworkTab })));
 const AnalyticsTab = lazy(() => import("./components/AnalyticsTab.tsx").then(m => ({ default: m.AnalyticsTab })));
-const LogsTab      = lazy(() => import("./components/LogsTab.tsx").then(m => ({ default: m.LogsTab })));
+const LogsTab             = lazy(() => import("./components/LogsTab.tsx").then(m => ({ default: m.LogsTab })));
+const NotificationsPanel  = lazy(() => import("./components/NotificationsPanel.tsx").then(m => ({ default: m.NotificationsPanel })));
 
 const LEVEL_COLOR: Record<string, string> = {
   fast:   "var(--fast)",
@@ -24,7 +26,7 @@ const LEVEL_COLOR: Record<string, string> = {
   down:   "var(--down)",
 };
 
-type Tab = "radar" | "firewall" | "edge" | "dns" | "workers" | "network" | "analytics" | "logs" | "shield";
+type Tab = "radar" | "firewall" | "edge" | "dns" | "workers" | "network" | "analytics" | "logs" | "shield" | "alerts";
 
 const TABS: { id: Tab; label: string; sub: string; short: string }[] = [
   { id: "radar",     label: "Radar",     sub: "Traffic",  short: "Radar"    },
@@ -36,6 +38,7 @@ const TABS: { id: Tab; label: string; sub: string; short: string }[] = [
   { id: "network",   label: "Network",   sub: "Map",      short: "Network"  },
   { id: "dns",       label: "DNS",       sub: "RPC",      short: "DNS"      },
   { id: "shield",    label: "Shield",    sub: "Uptime",   short: "Shield"   },
+  { id: "alerts",    label: "Alerts",    sub: "Notify",   short: "Alerts"   },
 ];
 
 function TabFallback() {
@@ -48,10 +51,24 @@ function TabFallback() {
 }
 
 export function App() {
-  const ping     = usePing();
-  const chain    = useChain();
-  const isMobile = useIsMobile();
-  useFailover(); // eagerly tests endpoints and promotes fastest — no DNS tab needed
+  const ping          = usePing();
+  const chain         = useChain();
+  const isMobile      = useIsMobile();
+  const notifications = useNotifications();
+  useFailover();
+
+  // Feed live data into notifications every time chain/ping updates
+  useEffect(() => {
+    if (!ping.current || chain.loading) return;
+    const maxThreat = chain.suspicious.length > 0 ? chain.suspicious[0]!.threatScore : 0;
+    notifications.feed({
+      txPerMin:  chain.stats.txPerMin,
+      latencyMs: ping.latencyMs,
+      level:     ping.level,
+      deploys:   chain.deploys.length,
+      maxThreat,
+    });
+  }, [chain.stats.txPerMin, ping.latencyMs, chain.deploys.length]);
   const color    = LEVEL_COLOR[ping.level] ?? "var(--fast)";
   const [tab, setTab] = useState<Tab>("radar");
 
@@ -133,8 +150,13 @@ export function App() {
                         onMouseEnter={e => { if (!active) { (e.currentTarget as HTMLButtonElement).style.color = "var(--text-2)"; (e.currentTarget as HTMLButtonElement).style.background = "var(--surface)"; } }}
                         onMouseLeave={e => { if (!active) { (e.currentTarget as HTMLButtonElement).style.color = "var(--text-3)"; (e.currentTarget as HTMLButtonElement).style.background = "transparent"; } }}
                       >
-                        <span>{label}</span>
-                        <span style={{ fontSize: 9, color: active ? "var(--text-3)" : "var(--text-4)", fontWeight: 400 }}>{sub}</span>
+                      <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                        {label}
+                        {id === "alerts" && notifications.settings.enabled && notifications.permission === "granted" && (
+                          <span style={{ width: 5, height: 5, borderRadius: "50%", background: "var(--fast)", display: "inline-block", flexShrink: 0 }} />
+                        )}
+                      </span>
+                      <span style={{ fontSize: 9, color: active ? "var(--text-3)" : "var(--text-4)", fontWeight: 400 }}>{sub}</span>
                       </button>
                     );
                   })}
@@ -175,6 +197,15 @@ export function App() {
                 {tab === "logs"      && <LogsTab blocks={chain.blocks} />}
                 {tab === "network"   && <NetworkTab blocks={chain.blocks} />}
                 {tab === "dns"       && <DnsTab isMobile={isMobile} />}
+                {tab === "alerts"    && (
+                  <NotificationsPanel
+                    settings={notifications.settings}
+                    permission={notifications.permission}
+                    isSupported={notifications.isSupported}
+                    onUpdate={notifications.updateSettings}
+                    onRequestPermission={notifications.requestPermission}
+                  />
+                )}
                 {tab === "shield"    && (
                   <ShieldTab
                     level={ping.level}
