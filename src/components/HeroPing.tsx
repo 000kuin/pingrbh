@@ -157,7 +157,7 @@ export function HeroPing({
           <div style={{ fontSize: 9, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--text-3)", marginBottom: 8 }}>
             RPC Response Time
           </div>
-          <div style={{ display: "flex", alignItems: "flex-end", gap: 8, marginBottom: 16, paddingRight: 8 }}>
+          <div style={{ display: "flex", alignItems: "flex-end", gap: 8, marginBottom: 16, paddingRight: 24 }}>
             <RollingNumber
               value={latencyMs}
               decimals={0}
@@ -165,7 +165,7 @@ export function HeroPing({
               style={{
                 fontSize: "clamp(56px, 7vw, 88px)",
                 fontWeight: 700,
-                letterSpacing: "-0.04em",
+                letterSpacing: "-0.02em",
                 lineHeight: 0.9,
                 fontFamily: "var(--mono)",
               }}
