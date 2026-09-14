@@ -144,13 +144,19 @@ export function HeroPing({
         </div>
       </div>
 
-      {/* Main metrics — three columns */}
+      {/* Main metrics — two columns, centered */}
       <div style={{
         padding: "28px 32px",
+        display: "flex",
+        justifyContent: "center",
+      }}>
+      <div style={{
         display: "grid",
         gridTemplateColumns: "1fr 1fr",
         alignItems: "start",
-        gap: "0 48px",
+        gap: "0 80px",
+        width: "100%",
+        maxWidth: 900,
       }}>
         {/* Left: latency */}
         <div style={{ paddingRight: 32 }}>
@@ -218,6 +224,7 @@ export function HeroPing({
           </div>
         </div>
 
+      </div>
       </div>
     </div>
   );
