@@ -346,17 +346,17 @@ const sections = [
     Icon: IconZap,
     title: "$PING — The on-chain heartbeat token",
     subtitle: "Infrastructure token for Robinhood Chain, paired against NET",
-    body: `$PING is the token behind pingrbh. It trades against NET (the Cloudflare stock token on Robinhood Chain) on Pons — the pair that makes itself. Cloudflare keeps the internet alive. $PING tells you if the chain is. Holders earn NET payouts. Fair launch on Pons, no presale, no insiders.`,
+    body: `$PING is the token behind pingrbh. It trades against NET (the Cloudflare stock token on Robinhood Chain) on Pons — the pair that makes itself. Cloudflare keeps the internet alive. $PING tells you if the chain is. Fair launch on Pons, no presale, no insiders.`,
     features: [
       {
         name: "The thesis",
         Icon: IconZap,
-        desc: "$PING is to Robinhood Chain what NET is to the internet. Both are infrastructure plays. Cloudflare routes 20% of the internet — NET tracks that. pingrbh monitors Robinhood Chain — $PING tracks that. The pair is not random: the company that keeps the internet up pays the token that monitors the chain.",
+        desc: "$PING is to Robinhood Chain what NET is to the internet. Both are infrastructure plays. Cloudflare routes 20% of the internet — NET tracks that. pingrbh monitors Robinhood Chain — $PING tracks that. The pair is not random: two infrastructure tokens, one chain.",
       },
       {
-        name: "NET payouts",
+        name: "NET pair",
         Icon: IconActivity,
-        desc: "Holders of $PING receive NET (Cloudflare stock token) as a payout. This creates a direct link between the narrative and the token mechanics — infrastructure pays infrastructure.",
+        desc: "$PING trades against NET (the Cloudflare stock token on Robinhood Chain) on Pons. The pair connects two infrastructure narratives — the tool that monitors the chain trades against the token that tracks the company keeping the internet alive.",
       },
       {
         name: "Fair launch on Pons",

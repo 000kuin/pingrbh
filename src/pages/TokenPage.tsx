@@ -160,7 +160,7 @@ export function TokenPage() {
         <p style={{ fontSize: 15, color: "var(--text-2)", maxWidth: 560, lineHeight: 1.7, marginBottom: 56 }}>
           Cloudflare Radar gives you real-time intelligence on the internet. pingrbh.com does the same
           for Robinhood Chain — live traffic, threat detection, contract deploys, and RPC health.
-          NET pays $PING holders because infrastructure powers infrastructure.
+          The infrastructure monitoring tool for Robinhood Chain, paired with NET.
         </p>
 
         <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 1, background: "var(--border)", border: "1px solid var(--border)", borderRadius: "var(--r-lg)", overflow: "hidden" }}>
@@ -187,8 +187,8 @@ export function TokenPage() {
             },
             {
               Icon: IconZap,
-              title: "NET payouts",
-              body: "Hold $PING, earn NET. Cloudflare — the company that routes 20% of the internet — pays the token that monitors the chain.",
+              title: "NET pair",
+              body: "$PING trades against NET — the Cloudflare stock token on Robinhood Chain. Infrastructure monitors infrastructure.",
             },
             {
               Icon: IconShield,
@@ -237,7 +237,7 @@ export function TokenPage() {
               { k: "Chain",           v: "Robinhood Chain (ID 4663)" },
               { k: "Trading hours",   v: "24/7 — chain never stops" },
               { k: "Launch",          v: "Fair launch on Pons" },
-              { k: "Payout",          v: "Holders earn NET" },
+              { k: "Pair",            v: "$PING / NET on Pons" },
             ]}
           />
           <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100%" }}>
@@ -253,7 +253,7 @@ export function TokenPage() {
               { k: "Chain",           v: "Robinhood Chain (ID 4663)" },
               { k: "Trading hours",   v: "24/7 on-chain (market hours on NYSE)" },
               { k: "Origin",          v: "Robinhood stock token" },
-              { k: "Connection",      v: "Pays out to $PING holders" },
+              { k: "Connection",      v: "Paired with $PING on Pons" },
             ]}
           />
         </div>
@@ -341,13 +341,13 @@ export function TokenPage() {
           How it works
         </div>
         <h2 style={{ fontSize: "clamp(24px,3.5vw,40px)", fontWeight: 800, letterSpacing: "-0.04em", marginBottom: 48, color: "var(--text)" }}>
-          Hold $PING. Earn NET.
+          How $PING works.
         </h2>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 1, background: "var(--border)", border: "1px solid var(--border)", borderRadius: "var(--r-lg)", overflow: "hidden" }}>
           {[
-            { n: "01", title: "Buy $PING",  body: "Fair launch on Pons. Bonding curve. No presale, no insiders.", accent: "var(--orange)" },
-            { n: "02", title: "Hold",        body: "Hold your position. The longer you hold, the more you accumulate.", accent: NET_COLOR },
-            { n: "03", title: "Earn NET",    body: "NET distributed to $PING holders. Infrastructure pays infrastructure.", accent: NET_COLOR },
+            { n: "01", title: "Buy $PING",   body: "Fair launch on Pons. Bonding curve. No presale, no insiders.", accent: "var(--orange)" },
+            { n: "02", title: "Trade",        body: "$PING / NET on Pons — the on-chain pair for Robinhood Chain infrastructure.", accent: NET_COLOR },
+            { n: "03", title: "Monitor",      body: "pingrbh.com gives $PING holders real-time visibility into the chain they're invested in.", accent: "var(--orange)" },
           ].map(({ n, title, body, accent }) => (
             <div key={n} style={{ padding: "32px 28px", background: "var(--surface)" }}>
               <div style={{ fontFamily: "var(--mono)", fontSize: 11, color: "var(--text-3)", marginBottom: 16, letterSpacing: "0.06em" }}>{n}</div>
