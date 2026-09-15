@@ -5,7 +5,7 @@ import {
 } from "../components/Icons.tsx";
 
 const PONS_URL  = "https://www.ponsfamily.com/launchpad";
-const PING_CA: string | null = null; // set this after token deploys on Pons
+const PING_CA: string | null = "0xce48e0cace55fe2229e6607d685fdf33b89cbb9b";
 const NET_COLOR = "#60a5fa";
 
 export function TokenPage() {
