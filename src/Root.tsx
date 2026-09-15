@@ -4,7 +4,6 @@ import { App } from "./App.tsx";
 import { IconExternalLink } from "./components/Icons.tsx";
 import { useBlockNumber } from "./hooks/useBlockNumber.ts";
 
-const TokenPage = lazy(() => import("./pages/TokenPage.tsx").then(m => ({ default: m.TokenPage })));
 const DocsPage  = lazy(() => import("./pages/DocsPage.tsx").then(m => ({ default: m.DocsPage })));
 const ApiPage   = lazy(() => import("./pages/ApiPage.tsx").then(m => ({ default: m.ApiPage })));
 
@@ -73,7 +72,6 @@ export function Root() {
             { href: "/",      label: "Monitor" },
             { href: "/api",   label: "API"     },
             { href: "/docs",  label: "Docs"    },
-            { href: "/token", label: "$PING"   },
           ].map(({ href, label }) => {
             const active = location === href;
             return (
@@ -144,7 +142,6 @@ export function Root() {
           <Route path="/"      component={App} />
           <Route path="/api"   component={ApiPage} />
           <Route path="/docs"  component={DocsPage} />
-          <Route path="/token" component={TokenPage} />
         </Switch>
       </Suspense>
     </>
