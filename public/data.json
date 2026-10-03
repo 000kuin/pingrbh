@@ -1,7 +1,7 @@
 {
   "rpc": {
-    "latencyMs": 297,
-    "blockNumber": 79252299,
+    "latencyMs": 279,
+    "blockNumber": 79345590,
     "level": "normal",
     "endpoint": "https://rpc.mainnet.chain.robinhood.com"
   },
@@ -16,9 +16,9 @@
     "contractDeploys": 0,
     "avgTxPerBlock": 6,
     "avgBlockTimeSec": 1,
-    "baseFeeGwei": 0.0236,
+    "baseFeeGwei": 0.0229,
     "windowBlocks": 20
   },
-  "timestamp": "2026-10-03T17:13:16.531Z",
+  "timestamp": "2026-10-03T19:50:16.311Z",
   "note": "Updated every 5 minutes via GitHub Actions. For real-time data call the RPC directly."
 }
