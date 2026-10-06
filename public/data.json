@@ -1,8 +1,8 @@
 {
   "rpc": {
-    "latencyMs": 1918,
-    "blockNumber": 81302980,
-    "level": "down",
+    "latencyMs": 482,
+    "blockNumber": 81548624,
+    "level": "normal",
     "endpoint": "https://rpc.mainnet.chain.robinhood.com"
   },
   "chain": {
@@ -11,14 +11,14 @@
     "stack": "Arbitrum Orbit"
   },
   "stats": {
-    "txPerMin": 3030,
-    "activeWallets": 69,
+    "txPerMin": 2430,
+    "activeWallets": 58,
     "contractDeploys": 0,
-    "avgTxPerBlock": 5,
+    "avgTxPerBlock": 4,
     "avgBlockTimeSec": 1,
     "baseFeeGwei": 0.02,
     "windowBlocks": 20
   },
-  "timestamp": "2026-10-06T03:07:29.221Z",
+  "timestamp": "2026-10-06T10:09:22.026Z",
   "note": "Updated every 5 minutes via GitHub Actions. For real-time data call the RPC directly."
 }
