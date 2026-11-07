@@ -41,10 +41,15 @@ export async function testRpc(url: string): Promise<{ latencyMs: number; blockNu
       body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: "eth_blockNumber", params: [] }),
       signal: AbortSignal.timeout(5000), // 5s timeout
     });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const latencyMs = Math.round(performance.now() - t0);
     const json = await res.json();
     if (json.error) return { latencyMs, blockNumber: 0, success: false, error: json.error.message };
+    if (typeof json.result !== "string" || !/^0x[0-9a-f]+$/i.test(json.result)) {
+      throw new Error("Invalid eth_blockNumber result");
+    }
     const blockNumber = parseInt(json.result, 16);
+    if (!Number.isSafeInteger(blockNumber)) throw new Error("Invalid eth_blockNumber result");
     return { latencyMs, blockNumber, success: true };
   } catch (e) {
     return {
